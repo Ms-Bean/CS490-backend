@@ -11,10 +11,9 @@ sudo apt install nodejs
 sudo apt install npm
 ```
 
-Next, within the folder containing server.js, set up NodeJS with the Express and cors modules as follows
+Next, within the folder containing server.js, install the dependencies defined in package.js as follows
 ```bash
-npm init
-npm i express cors
+npm install
 ``` 
 Finally, start the server
 ```bash
