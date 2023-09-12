@@ -1,4 +1,4 @@
-# CS490
+# CS490-backend
 ## A backend for the cs490 project (NodeJS, Express)
 
 
