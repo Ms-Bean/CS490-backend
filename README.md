@@ -11,7 +11,7 @@ sudo apt install nodejs
 sudo apt install npm
 ```
 
-Next, within the folder containing server.js, install the dependencies defined in package.js as follows
+Next, within the folder containing server.js, install the dependencies defined in package.json as follows
 ```bash
 npm install
 ``` 
