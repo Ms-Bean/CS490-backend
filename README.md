@@ -19,4 +19,4 @@ Finally, start the server
 node server.js
 ```
 
-Once all of these steps are completed, the rest call made by the front end should succeed.
+Once all of these steps are completed, the rest call made by index.html on the frontend should succeed.
