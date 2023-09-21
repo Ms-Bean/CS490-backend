@@ -1,7 +1,8 @@
 const express = require('express')
 const cors = require('cors')
+const mysql = require('mysql');
 const app = express()
-const PORT = process.env.PORT
+const PORT = process.env.PORT || 3500
 
 app.use(cors({
     origin: '*'
