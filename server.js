@@ -148,7 +148,7 @@ app.get('/get_customer_list', (req, res) => {
     }
     if(req.headers.customer_first_name)
     {
-        if(!/^[a-zA-Z\-]$/.test(req.headers.first_name))
+        if(!/^[a-zA-Z\-]*$/.test(req.headers.first_name))
         {
             res.status(200).send({
                 failure: 1,
@@ -159,7 +159,7 @@ app.get('/get_customer_list', (req, res) => {
     }
     if(req.headers.customer_last_name)
     {
-        if(!/^[a-zA-Z\-]$/.test(req.headers.last_name))
+        if(!/^[a-zA-Z\-]*$/.test(req.headers.last_name))
         {
             res.status(200).send({
                 failure: 1,
@@ -169,7 +169,7 @@ app.get('/get_customer_list', (req, res) => {
         }
     }
 
-    var sql_string = "SELECT customer_id, first_name, last_name, email FROM customer WHERE active = TRUE ";
+    var sql_string = "SELECT customer_id, first_name, last_name, email, store_id, address_id FROM customer WHERE active = TRUE ";
     if(req.headers.customer_id)
     {
         sql_string += " AND LOWER(customer_id) = LOWER('" + req.headers.customer_id + "')";
@@ -347,7 +347,7 @@ app.post("/update_customer", (req, res) => {
     }
     /*Verify that the database can handle the request*/
 
-    value_count_in_column("store", "store_id", req.headers.store_id).then( function(store_count){
+    value_count_in_column("store", "store_id", req.headers.store_id ? req.headers.store_id : "").then( function(store_count){
     value_count_in_column("customer", "customer_id", req.headers.customer_id).then( function(customer_count){
     if(customer_count == 0)
     {
@@ -367,7 +367,7 @@ app.post("/update_customer", (req, res) => {
         return;
     }
     
-    if(store_count < 1)
+    if(req.headers.store_id && store_count < 1)
     {
         res.status(200).send({
             failure: 1,
@@ -394,7 +394,7 @@ app.post("/update_customer", (req, res) => {
     }
     if(req.headers.address_id)
     {
-        sql_string += "address_id = " + req.headers.last_name + ", ";
+        sql_string += "address_id = " + req.headers.address_id + ", ";
     }
     sql_string = sql_string.substring(0, sql_string.length - 2) /* Remove the final comma and space at the end */
 
