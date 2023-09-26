@@ -104,7 +104,52 @@ app.get('/get_film_info', (req, res) => {
     }
 });
 app.get('/get_film_list', (req, res) => {
-    var sql_string = "SELECT DISTINCT T3.film_id, T3.title, T3.name AS category FROM (SELECT T2.film_id, T2.title, T2.name, film_actor.actor_id FROM (SELECT T1.film_id, T1.title, category.name FROM (SELECT film.film_id, film.title, film_category.category_id FROM film INNER JOIN film_category ON film.film_id = film_category.film_id) T1 INNER JOIN category ON T1.category_id = category.category_id) T2 INNER JOIN film_actor ON T2.film_id = film_actor.film_id) T3 INNER JOIN actor ON T3.actor_id = actor.actor_id WHERE active = TRUE";
+    /* Sanitize input */
+    if(req.headers.title)
+    {
+        if(!/^[a-zA-Z ]*$/.test(req.headers.title))
+        {
+            res.status(200).send({
+                failure: 1,
+                message: 'Title can only contain letters and spaces'
+            })
+            return;
+        }
+    }
+    if(req.headers.actor_first_name)
+    {
+        if(!/^[a-zA-Z\-]*$/.test(req.headers.actor_first_name))
+        {
+            res.status(200).send({
+                failure: 1,
+                message: 'Actor first name can only contain letters and hyphens'
+            })
+            return;
+        }
+    }
+    if(req.headers.actor_last_name)
+    {
+        if(!/^[a-zA-Z\-]*$/.test(req.headers.actor_last_name))
+        {
+            res.status(200).send({
+                failure: 1,
+                message: 'Actor last name can only contain letters and hyphens'
+            })
+            return;
+        }
+    }
+    if(req.headers.genre)
+    {
+        if(!/^[a-zA-Z\ ]*$/.test(req.headers.genre))
+        {
+            res.status(200).send({
+                failure: 1,
+                message: 'Genre can only contain letters and spaces'
+            })
+            return;
+        }
+    }
+    var sql_string = "SELECT DISTINCT T3.film_id, T3.title, T3.name AS category FROM (SELECT T2.film_id, T2.title, T2.name, film_actor.actor_id FROM (SELECT T1.film_id, T1.title, category.name FROM (SELECT film.film_id, film.title, film_category.category_id FROM film INNER JOIN film_category ON film.film_id = film_category.film_id) T1 INNER JOIN category ON T1.category_id = category.category_id) T2 INNER JOIN film_actor ON T2.film_id = film_actor.film_id) T3 INNER JOIN actor ON T3.actor_id = actor.actor_id";
     if(req.headers.title)
     {
         sql_string += " AND LOWER(T3.title) = LOWER('" + req.headers.title + "')";
@@ -128,7 +173,9 @@ app.get('/get_film_list', (req, res) => {
             throw err;
 
         res.status(200).send({
-            result
+            failure: 0,
+            message: result.length + " film(s) returned",
+            result_table: result
         })
     });
     
@@ -148,7 +195,7 @@ app.get('/get_customer_list', (req, res) => {
     }
     if(req.headers.customer_first_name)
     {
-        if(!/^[a-zA-Z\-]*$/.test(req.headers.first_name))
+        if(!/^[a-zA-Z\-]*$/.test(req.headers.customer_first_name))
         {
             res.status(200).send({
                 failure: 1,
@@ -159,7 +206,7 @@ app.get('/get_customer_list', (req, res) => {
     }
     if(req.headers.customer_last_name)
     {
-        if(!/^[a-zA-Z\-]*$/.test(req.headers.last_name))
+        if(!/^[a-zA-Z\-]*$/.test(req.headers.customer_last_name))
         {
             res.status(200).send({
                 failure: 1,
@@ -282,7 +329,7 @@ app.post("/update_customer", (req, res) => {
         })
         return;
     }
-    if(!req.headers.store_id && !req.headers.first_name && !req.headers.last_name && !req.headers.address_id)
+    if(!req.headers.store_id && !req.headers.first_name && !req.headers.last_name && !req.headers.address_id && !req.headers.email)
     {
         res.status(200).send({
             failure: 1,
