@@ -85,7 +85,18 @@ app.get('/get_top_5_rented_films', (req, res) => {
         })
     });
 });
+app.get('/get_top_5_actors', (req, res) =>{con.query("SELECT actor.actor_id, actor.first_name, actor.last_name, COUNT(T1.title) AS number_of_films FROM (SELECT film.film_id, film.title, film_actor.actor_id FROM film INNER JOIN film_actor ON film.film_id=film_actor.film_id) T1 INNER JOIN actor ON T1.actor_id=actor.actor_id GROUP BY T1.actor_id ORDER BY COUNT(T1.title) DESC LIMIT 5;", 
+    function (err, result, fields) {
+        if (err) 
+            throw err;
 
+        res.status(200).send({
+            failure: 0,
+            message: "",
+            result_table: result
+        })
+    });
+})
 app.get('/get_film_info', (req, res) => {
     if(req.headers.film_id)
     {
@@ -97,7 +108,31 @@ app.get('/get_film_info', (req, res) => {
                     throw err;
         
                 res.status(200).send({
-                    result
+                    failure: 0,
+                    message: "",
+                    result_table: result
+                })
+            });
+        }
+    }
+});
+
+app.get('/get_actor_info', (req, res) => {
+    if(req.headers.actor_id)
+    {
+        if(/^[0-9]*$/.test(req.headers.actor_id)) /* Only accept numerical values (no sql injection please) */
+        {
+            con.query("SELECT T3.first_name, T3.last_name, T3.film_id, film.title, T3.number_of_rentals FROM (SELECT COUNT(T2.rental_id) AS number_of_rentals, T2.film_id, actor.actor_id, actor.first_name, actor.last_name FROM (SELECT T1.film_id, T1.rental_id, film_actor.actor_id FROM (SELECT rental.rental_id, inventory.film_id FROM rental INNER JOIN inventory ON rental.inventory_id = inventory.inventory_id) T1 INNER JOIN film_actor ON T1.film_id = film_actor.film_id) T2 INNER JOIN actor ON T2.actor_id = actor.actor_id WHERE actor.actor_id = "
+            + req.headers.actor_id
+            + " GROUP BY T2.film_id) T3 INNER JOIN film ON T3.film_id = film.film_id ORDER BY number_of_rentals DESC LIMIT 5;", 
+            function (err, result, fields) {
+                if (err) 
+                    throw err;
+        
+                res.status(200).send({
+                    failure: 0,
+                    message: "",
+                    result_table: result
                 })
             });
         }
@@ -184,7 +219,7 @@ app.get('/get_customer_list', (req, res) => {
     /*Input santization*/
     if(req.headers.customer_id)
     {
-        if(typeof(req.headers.customer_id) != "number")
+        if(!/^[0-9]*$/.test(req.headers.customer_id))
         {
             res.status(200).send({
                 failure: 1,
@@ -237,7 +272,7 @@ app.get('/get_customer_list', (req, res) => {
 
         res.status(200).send({
             failure: 0,
-            message: "",
+            message: result.length + " customer(s) returned",
             result_table: result
         })
     });
@@ -254,7 +289,7 @@ app.post("/add_customer", (req, res) => {
         })
         return;
     }
-    if(typeof(req.headers.store_id) != "number" || typeof(req.headers.address_id != "number"))
+    if(!/^[0-9]*$/.test(req.headers.store_id) || !/^[0-9]*$/.test(req.headers.address_id))
     {
         res.status(200).send({
             failure: 1,
