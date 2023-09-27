@@ -19,4 +19,5 @@ Finally, start the server
 node server.js
 ```
 
-Once all of these steps are completed, the rest call made by index.html on the frontend should succeed.
+Also, a video demonstration of the sever working so far can be found here.
+[https://www.youtube.com/watch?v=my3khDmXmPM]

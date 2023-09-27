@@ -81,7 +81,9 @@ app.get('/get_top_5_rented_films', (req, res) => {
             throw err;
 
         res.status(200).send({
-            result
+            failure: 0,
+            message: "",
+            result_table: result
         })
     });
 });
@@ -184,10 +186,10 @@ app.get('/get_film_list', (req, res) => {
             return;
         }
     }
-    var sql_string = "SELECT DISTINCT T3.film_id, T3.title, T3.name AS category FROM (SELECT T2.film_id, T2.title, T2.name, film_actor.actor_id FROM (SELECT T1.film_id, T1.title, category.name FROM (SELECT film.film_id, film.title, film_category.category_id FROM film INNER JOIN film_category ON film.film_id = film_category.film_id) T1 INNER JOIN category ON T1.category_id = category.category_id) T2 INNER JOIN film_actor ON T2.film_id = film_actor.film_id) T3 INNER JOIN actor ON T3.actor_id = actor.actor_id";
+    var sql_string = "SELECT DISTINCT T3.film_id, T3.title, T3.name AS category, T3.description FROM (SELECT T2.film_id, T2.title, T2.name, T2.description, film_actor.actor_id FROM (SELECT T1.film_id, T1.title, T1.description, category.name FROM (SELECT film.film_id, film.title, film_category.category_id, film.description FROM film INNER JOIN film_category ON film.film_id = film_category.film_id) T1 INNER JOIN category ON T1.category_id = category.category_id) T2 INNER JOIN film_actor ON T2.film_id = film_actor.film_id) T3 INNER JOIN actor ON T3.actor_id = actor.actor_id WHERE 1=1";
     if(req.headers.title)
     {
-        sql_string += " AND LOWER(T3.title) = LOWER('" + req.headers.title + "')";
+        sql_string += " AND LOWER(T3.title) LIKE LOWER('%" + req.headers.title + "%')";
     }
     if(req.headers.genre)
     {
@@ -195,13 +197,13 @@ app.get('/get_film_list', (req, res) => {
     }
     if(req.headers.actor_first_name)
     {
-        sql_string += " AND LOWER(actor.first_name) = LOWER('" + req.headers.actor_first_name + "')"; 
+        sql_string += " AND LOWER(actor.first_name) LIKE LOWER('%" + req.headers.actor_first_name + "%')"; 
     }
     if(req.headers.actor_last_name)
     {
-        sql_string += " AND LOWER(actor.last_name) = LOWER('" + req.headers.actor_last_name + "')";
+        sql_string += " AND LOWER(actor.last_name) LIKE LOWER('%" + req.headers.actor_last_name + "%')";
     }
-    sql_string += ";";
+    sql_string += " ORDER BY T3.film_id;";
     con.query(sql_string, 
     function (err, result, fields) {
         if (err) 
@@ -319,7 +321,6 @@ app.post("/add_customer", (req, res) => {
 
     /*Determine if the database can accept the request*/
     value_count_in_column("store", "store_id", req.headers.store_id).then( function(count){ /*The store must exist*/
-
     if(count == 0)
     {
         res.status(200).send({
