@@ -1,8 +1,9 @@
-const express = require('express')
-const cors = require('cors')
+const express = require('express');
+const cors = require('cors');
 const mysql = require('mysql');
-const app = express()
-const PORT = process.env.PORT || 3500
+const http = require('http');
+const app = express();
+const PORT = 3500;
 
 var con = mysql.createConnection({
     host: "localhost",
@@ -68,9 +69,11 @@ async function get_value_where(table_name, column_where, value_where, column_get
 app.use(cors({
     origin: '*'
 }));
-app.listen(PORT, () => console.log(`server running on port ${PORT}`))
+const server = http.createServer(app);
+server.listen(3500);
+
 app.get('/healthcheck', (req, res) => {
-    res.status(200).send({
+    return res.status(200).send({
         value: 'Hello world'
     })
 });
@@ -80,7 +83,7 @@ app.get('/get_top_5_rented_films', (req, res) => {
         if (err) 
             throw err;
 
-        res.status(200).send({
+        return res.status(200).send({
             failure: 0,
             message: "",
             result_table: result
@@ -92,7 +95,7 @@ app.get('/get_top_5_actors', (req, res) =>{con.query("SELECT actor.actor_id, act
         if (err) 
             throw err;
 
-        res.status(200).send({
+        return res.status(200).send({
             failure: 0,
             message: "",
             result_table: result
@@ -109,7 +112,7 @@ app.get('/get_film_info', (req, res) => {
                 if (err) 
                     throw err;
         
-                res.status(200).send({
+                return res.status(200).send({
                     failure: 0,
                     message: "",
                     result_table: result
@@ -131,7 +134,7 @@ app.get('/get_actor_info', (req, res) => {
                 if (err) 
                     throw err;
         
-                res.status(200).send({
+                return res.status(200).send({
                     failure: 0,
                     message: "",
                     result_table: result
@@ -146,7 +149,7 @@ app.get('/get_film_list', (req, res) => {
     {
         if(!/^[a-zA-Z ]*$/.test(req.headers.title))
         {
-            res.status(200).send({
+            return res.status(200).send({
                 failure: 1,
                 message: 'Title can only contain letters and spaces'
             })
@@ -157,7 +160,7 @@ app.get('/get_film_list', (req, res) => {
     {
         if(!/^[a-zA-Z\-]*$/.test(req.headers.actor_first_name))
         {
-            res.status(200).send({
+            return res.status(200).send({
                 failure: 1,
                 message: 'Actor first name can only contain letters and hyphens'
             })
@@ -168,7 +171,7 @@ app.get('/get_film_list', (req, res) => {
     {
         if(!/^[a-zA-Z\-]*$/.test(req.headers.actor_last_name))
         {
-            res.status(200).send({
+            return res.status(200).send({
                 failure: 1,
                 message: 'Actor last name can only contain letters and hyphens'
             })
@@ -179,7 +182,7 @@ app.get('/get_film_list', (req, res) => {
     {
         if(!/^[a-zA-Z\ ]*$/.test(req.headers.genre))
         {
-            res.status(200).send({
+            return res.status(200).send({
                 failure: 1,
                 message: 'Genre can only contain letters and spaces'
             })
@@ -209,7 +212,7 @@ app.get('/get_film_list', (req, res) => {
         if (err) 
             throw err;
 
-        res.status(200).send({
+        return res.status(200).send({
             failure: 0,
             message: result.length + " film(s) returned",
             result_table: result
@@ -223,7 +226,7 @@ app.get('/get_customer_list', (req, res) => {
     {
         if(!/^[0-9]*$/.test(req.headers.customer_id))
         {
-            res.status(200).send({
+            return res.status(200).send({
                 failure: 1,
                 message: 'Customer ID must be a number'
             })
@@ -234,7 +237,7 @@ app.get('/get_customer_list', (req, res) => {
     {
         if(!/^[a-zA-Z\-]*$/.test(req.headers.customer_first_name))
         {
-            res.status(200).send({
+            return res.status(200).send({
                 failure: 1,
                 message: 'First name must contain only letters or hyphens'
             })
@@ -245,7 +248,7 @@ app.get('/get_customer_list', (req, res) => {
     {
         if(!/^[a-zA-Z\-]*$/.test(req.headers.customer_last_name))
         {
-            res.status(200).send({
+            return res.status(200).send({
                 failure: 1,
                 message: 'Last name must contain only letters or hyphens'
             })
@@ -272,7 +275,7 @@ app.get('/get_customer_list', (req, res) => {
         if (err) 
             throw err;
 
-        res.status(200).send({
+        return res.status(200).send({
             failure: 0,
             message: result.length + " customer(s) returned",
             result_table: result
@@ -284,7 +287,7 @@ app.post("/add_customer", (req, res) => {
     /*Input sanitization*/
     if(!req.headers.store_id || !req.headers.first_name || !req.headers.last_name || !req.headers.address_id)
     {
-        res.status(200).send({
+        return res.status(200).send({
             failure: 1,
             message: 'Missing values. All values except email are required.'
         })
@@ -292,7 +295,7 @@ app.post("/add_customer", (req, res) => {
     }
     if(!/^[0-9]*$/.test(req.headers.store_id) || !/^[0-9]*$/.test(req.headers.address_id))
     {
-        res.status(200).send({
+        return res.status(200).send({
             failure: 1,
             message: 'Store id and address id must be numbers.'
         })
@@ -300,7 +303,7 @@ app.post("/add_customer", (req, res) => {
     }
     if(!/^[a-zA-Z\-]*$/.test(req.headers.first_name) || !/^[a-zA-Z\-]*$/.test(req.headers.last_name))
     {
-        res.status(200).send({
+        return res.status(200).send({
             failure: 1,
             message: 'First and last name must contain only letters and hyphens.'
         })
@@ -310,7 +313,7 @@ app.post("/add_customer", (req, res) => {
     {
         if(!/^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/.test(req.headers.email)) /* I stole this regex from https://saturncloud.io/blog/how-can-i-validate-an-email-address-using-a-regular-expression/ */
         {
-            res.status(200).send({
+            return res.status(200).send({
                 failure: 1,
                 message: 'The email must be a valid email.'
             })
@@ -322,7 +325,7 @@ app.post("/add_customer", (req, res) => {
     value_count_in_column("store", "store_id", req.headers.store_id).then( function(count){ /*The store must exist*/
     if(count == 0)
     {
-        res.status(200).send({
+        return res.status(200).send({
             failure: 1,
             message: 'The store id corresponds to a store that does not exist.'
         })
@@ -347,7 +350,7 @@ app.post("/add_customer", (req, res) => {
         if (err) 
             throw err;
 
-        res.status(200).send({
+        return res.status(200).send({
             failure: 0,
             message: 'Customer added'
         })
@@ -358,7 +361,7 @@ app.post("/update_customer", (req, res) => {
     /*Input sanitization*/
     if(!req.headers.customer_id)
     {
-        res.status(200).send({
+        return res.status(200).send({
             failure: 1,
             message: 'Customer ID is needed to update customer information.'
         })
@@ -366,7 +369,7 @@ app.post("/update_customer", (req, res) => {
     }
     if(!req.headers.store_id && !req.headers.first_name && !req.headers.last_name && !req.headers.address_id && !req.headers.email)
     {
-        res.status(200).send({
+        return res.status(200).send({
             failure: 1,
             message: 'No values are set to be updated.',
         })
@@ -376,7 +379,7 @@ app.post("/update_customer", (req, res) => {
     {
         if(!/^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/.test(req.headers.email)) /* I stole this regex from https://saturncloud.io/blog/how-can-i-validate-an-email-address-using-a-regular-expression/ */
         {
-            res.status(200).send({
+            return res.status(200).send({
                 failure: 1,
                 message: 'The email must be a valid email.'
             })
@@ -387,7 +390,7 @@ app.post("/update_customer", (req, res) => {
     {
         if(!/^[0-9]*$/.test(req.headers.store_id))
         {
-            res.status(200).send({
+            return res.status(200).send({
                 failure: 1,
                 message: 'Store ID must be a number.',
             })
@@ -398,7 +401,7 @@ app.post("/update_customer", (req, res) => {
     {
         if(!/^[a-zA-Z\-]*$/.test(req.headers.first_name))
         {
-            res.status(200).send({
+            return res.status(200).send({
                 failure: 1,
                 message: 'First name must only contain letters and hyphens.',
             })
@@ -409,7 +412,7 @@ app.post("/update_customer", (req, res) => {
     {
         if(!/^[a-zA-Z\-]*$/.test(req.headers.last_name))
         {
-            res.status(200).send({
+            return res.status(200).send({
                 failure: 1,
                 message: 'Last name must only contain letters and hyphens.',
             })
@@ -420,7 +423,7 @@ app.post("/update_customer", (req, res) => {
     {
         if(!/^[0-9]*$/.test(req.headers.address_id))
         {
-            res.status(200).send({
+            return res.status(200).send({
                 failure: 1,
                 message: 'Address ID must be a number.',
             })
@@ -433,7 +436,7 @@ app.post("/update_customer", (req, res) => {
     value_count_in_column("customer", "customer_id", req.headers.customer_id).then( function(customer_count){
     if(customer_count == 0)
     {
-        res.status(200).send({
+        return res.status(200).send({
             failure: 1,
             message: 'Customer does not exist.',
         })
@@ -442,7 +445,7 @@ app.post("/update_customer", (req, res) => {
     get_value_where("customer", "customer_id", req.headers.customer_id, "active").then( function(customer_is_active){
     if(customer_is_active == 0)
     {
-        res.status(200).send({
+        return res.status(200).send({
             failure: 1,
             message: 'Customer does not exist.',
         })
@@ -451,7 +454,7 @@ app.post("/update_customer", (req, res) => {
     
     if(req.headers.store_id && store_count < 1)
     {
-        res.status(200).send({
+        return res.status(200).send({
             failure: 1,
             message: 'Store ID corresponds to a store that does not exist.',
         })
@@ -487,7 +490,7 @@ app.post("/update_customer", (req, res) => {
         if (err) 
             throw err;
 
-        res.status(200).send({
+        return res.status(200).send({
             failure: 0,
             message: 'Customer information updated.',
         })
@@ -501,7 +504,7 @@ app.post("/delete_customer", (req, res) => {
     /*Input sanitization*/
     if(!req.headers.customer_id)
     {
-        res.status(200).send({
+        return res.status(200).send({
             failure: 1,
             message: 'Customer ID is needed to delete the customer.'
         })
@@ -509,7 +512,7 @@ app.post("/delete_customer", (req, res) => {
     }
     if(!/^[0-9]*$/.test(req.headers.customer_id))
     {
-        res.status(200).send({
+        return res.status(200).send({
             failure: 1,
             message: 'Customer ID needs to be a number.'
         })
@@ -519,7 +522,7 @@ app.post("/delete_customer", (req, res) => {
     value_count_in_column("customer", "customer_id", req.headers.customer_id).then( function(customer_count){
     if(customer_count == 0)
     {
-        res.status(200).send({
+        return res.status(200).send({
             failure: 1,
             message: 'Customer does not exist.',
         })
@@ -528,7 +531,7 @@ app.post("/delete_customer", (req, res) => {
     get_value_where("customer", "customer_id", req.headers.customer_id, "active").then( function(customer_is_active){
     if(customer_is_active == 0)
     {
-        res.status(200).send({
+        return res.status(200).send({
             failure: 1,
             message: 'Customer does not exist.',
         })
@@ -542,7 +545,7 @@ app.post("/delete_customer", (req, res) => {
         if (err) 
             throw err;
 
-        res.status(200).send({
+        return res.status(200).send({
             failure: 0,
             message: 'Customer deleted.'
         })
@@ -551,3 +554,4 @@ app.post("/delete_customer", (req, res) => {
     });
     });
 })
+module.exports = app;
