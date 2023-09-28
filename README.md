@@ -20,4 +20,4 @@ node server.js
 ```
 
 Also, a video demonstration of the sever working so far can be found here.
-[https://www.youtube.com/watch?v=cU1VUX7Igew]
+[https://www.youtube.com/watch?v=AExKr4F5Tt8]
