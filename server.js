@@ -281,7 +281,6 @@ app.get('/get_customer_list', (req, res) => {
     
 });
 app.post("/add_customer", (req, res) => {
-
     /*Input sanitization*/
     if(!req.headers.store_id || !req.headers.first_name || !req.headers.last_name || !req.headers.address_id)
     {

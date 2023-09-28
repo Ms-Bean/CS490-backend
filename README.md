@@ -19,5 +19,5 @@ Finally, start the server
 node server.js
 ```
 
-Also, a video demonstration of the sever working so far can be found here.
+Also, a video demonstration of the frontend and server working so far can be found here.
 [https://www.youtube.com/watch?v=my3khDmXmPM]
