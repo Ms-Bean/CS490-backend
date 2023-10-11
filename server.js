@@ -709,7 +709,7 @@ app.post("/return_film", (req, res) => {
 })
 
 app.post("/get_pdf_report", (req, res) => {
-    sql_string = "SELECT customer.first_name, customer.last_name, rental.rental_id, rental.rental_date, rental.inventory_id, rental.return_date FROM rental INNER JOIN customer ON rental.customer_id = customer.customer_id WHERE customer.customer_id = " + req.headers.customer_id + ";";
+    sql_string = "SELECT customer.first_name, customer.last_name, rental.rental_id, rental.rental_date FROM customer INNER JOIN rental ON customer.customer_id = rental.rental_id WHERE rental.return_date IS NULL";
     con.query(sql_string, function (err, result, fields) {
         if (err) 
             throw err;
