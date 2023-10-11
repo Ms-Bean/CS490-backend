@@ -198,7 +198,7 @@
     "path-key": "^3.1.1",
     "path-parse": "^1.0.7",
     "path-to-regexp": "^0.1.7",
-    "pdfkit": "^0.13.0",
+    "pdfkit-table": "^0.1.99",
     "picocolors": "^1.0.0",
     "picomatch": "^2.3.1",
     "pirates": "^4.0.6",

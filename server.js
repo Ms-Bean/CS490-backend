@@ -5,7 +5,7 @@ const http = require('http');
 
 
 const fs = require('fs');
-const PDFDocument = require('pdfkit');
+const PDFDocument = require('pdfkit-table');
 const path = require('path');
 
 const app = express();
@@ -708,17 +708,28 @@ app.post("/return_film", (req, res) => {
     })});
 })
 
+app.post("/get_pdf_report", (req, res) => {
+    sql_string = "SELECT customer.first_name, customer.last_name, rental.rental_id, rental.rental_date, rental.inventory_id, rental.return_date FROM rental INNER JOIN customer ON rental.customer_id = customer.customer_id WHERE customer.customer_id = " + req.headers.customer_id + ";";
+    con.query(sql_string, function (err, result, fields) {
+        if (err) 
+            throw err;
+        
+        const doc = new PDFDocument(); 
+        doc.pipe(fs.createWriteStream('rental_report.pdf')); 
 
-app.get("/get_pdf_report", (req, res) => {
+        doc 
+            .fontSize(27) 
+            .text('Test', 100, 100); 
 
-    const doc = new PDFDocument(); 
-   
-    doc.pipe(fs.createWriteStream('test.pdf')); 
-    doc 
-       
-      .fontSize(27) 
-      .text('test', 100, 100); 
-    doc.end();
+        doc.end();
+        return res.status(200).send({
+            failure: 0
+        })
+    });
+})
+app.get("/rental_report.pdf", (req, res) => {
+    res.contentType("application/pdf");
+    res.sendFile(__dirname + "/rental_report.pdf");
 })
 
 module.exports = app;
