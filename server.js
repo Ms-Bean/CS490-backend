@@ -709,22 +709,36 @@ app.post("/return_film", (req, res) => {
 })
 
 app.post("/get_pdf_report", (req, res) => {
-    sql_string = "SELECT customer.first_name, customer.last_name, rental.rental_id, rental.rental_date FROM customer INNER JOIN rental ON customer.customer_id = rental.rental_id WHERE rental.return_date IS NULL";
+    sql_string = "SELECT customer.first_name, customer.last_name, rental.rental_id, rental.rental_date FROM customer INNER JOIN rental ON customer.customer_id = rental.customer_id WHERE rental.return_date IS NULL";
     con.query(sql_string, function (err, result, fields) {
         if (err) 
             throw err;
-        
         const doc = new PDFDocument(); 
         doc.pipe(fs.createWriteStream('rental_report.pdf')); 
-
-        doc 
-            .fontSize(27) 
-            .text('Test', 100, 100); 
-
-        doc.end();
+        rental_rows = [];
+        for(var i = 0; i < result.length; i++)
+        {
+            rental_rows.push([result[i].first_name, result[i].last_name, result[i].rental_id, result[i].rental_date]);
+        } 
+        ;(async function(){
+            // table 
+            const table = {
+                title: "Title",
+                headers: [{"label":'First name', "width":80}, {"label":'Last name', "width":80}, {"label":'Rental ID', "width":40}, {"label":'Rental Date', "width":250}],
+                rows: rental_rows
+            };
+            // A4 595.28 x 841.89 (portrait) (about width sizes)
+            // width
+            await doc.table(table, { 
+                width: 500,
+            });
+            // done!
+            doc.end();
+        })();
         return res.status(200).send({
             failure: 0
         })
+    
     });
 })
 app.get("/rental_report.pdf", (req, res) => {
