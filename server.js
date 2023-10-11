@@ -1,3 +1,4 @@
+const PORT = 3500; //Replace with your desired port
 const express = require('express');
 const cors = require('cors');
 const mysql = require('mysql');
@@ -9,17 +10,17 @@ const PDFDocument = require('pdfkit-table');
 const path = require('path');
 
 const app = express();
-const PORT = 3500;
-
-var con = mysql.createConnection({
+let database_name = "sakila" //Replace with your database name
+var con = mysql.createConnection({ 
     host: "localhost",
-    user: "root",
-    password: "cactusgreen"
+    user: "root", //Replace with your user
+    password: "cactusgreen" //Replace with your password
 });
+
 con.connect(function(err) {
     if (err) 
         throw err;
-    con.query("USE sakila", function (err, result, fields) {
+    con.query("USE " + database_name, function (err, result, fields) {
         if (err) 
             throw err;
     });
