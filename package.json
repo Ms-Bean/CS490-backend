@@ -181,6 +181,7 @@
     "node-int64": "^0.4.0",
     "node-releases": "^2.0.13",
     "normalize-path": "^3.0.0",
+    "npm": "^10.2.0",
     "npm-run-path": "^4.0.1",
     "object-assign": "^4.1.1",
     "object-inspect": "^1.12.3",
@@ -273,8 +274,7 @@
     "yocto-queue": "^0.1.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "test": "jest"
   },
   "repository": {
     "type": "git",

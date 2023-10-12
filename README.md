@@ -25,6 +25,8 @@ const PORT = 3500; //Replace with your desired port
 Next, run the following commands to install node and run server.js, while in the backend directory.
 It is important that the directory containing server.js is the working directory while doing this.
 ```bash
+sudo apt update
+
 sudo apt install nodejs #Installs nodejs
 
 npm install #Installs the packages as defined in package.json
