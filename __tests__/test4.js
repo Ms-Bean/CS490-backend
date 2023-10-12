@@ -39,7 +39,7 @@ test_cases = [
 ];
 var krell_id;
 test_cases.forEach((test_case) => {
-    test('get customer list test', async () => {
+    test('Delete customer test', async () => {
         let response = await fetch(server_url + "get_customer_list/",{
             method: "GET",
             mode: "cors",
